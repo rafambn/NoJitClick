@@ -48,7 +48,7 @@ afterEvaluate {
                 from components.release
 
                 groupId = 'com.github.rafambn'
-                artifactId = 'No-Jit-Click'
+                artifactId = 'NoJitClick'
                 version = 'fullVersion'
             }
         }
