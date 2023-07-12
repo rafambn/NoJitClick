@@ -72,8 +72,8 @@ class NoJitterOnClickListener : OnClickListener {
                 if (clickableView.view == view) {
                     if (clickableViewGroup.isAsync) {
                         if (clickableViewGroup.isClickable.get()) {
-                            clickableView.listener.onSingleClick(view)
                             clickableViewGroup.isClickable.set(false)
+                            clickableView.listener.onSingleClick(view)
                         }
                     } else {
                         if (clickableViewGroup.isClickable.get()) {
