@@ -27,7 +27,7 @@ class NoJitterOnClickListener : OnClickListener {
 
     fun setListener(view: View, listener: OnSingleClickListener, groupId: Int, clickInterval: Long): NoJitterOnClickListener {
         var hasGroupId = false
-        for (clickableViewGroup in mClickables)
+        for (clickableViewGroup in this.mClickables)
             if (clickableViewGroup.groupId == groupId) {
                 clickableViewGroup.mutableListClickableView.add(ClickableView(view, listener))
                 hasGroupId = true
@@ -39,7 +39,7 @@ class NoJitterOnClickListener : OnClickListener {
 
     fun setAsyncListener(view: View, listener: OnSingleClickListener, groupId: Int): NoJitterOnClickListener? {
         var hasGroupId = false
-        for (clickableViewGroup in mClickables)
+        for (clickableViewGroup in this.mClickables)
             if (clickableViewGroup.groupId == groupId) {
                 if (!clickableViewGroup.isAsync)
                     return null
@@ -52,14 +52,14 @@ class NoJitterOnClickListener : OnClickListener {
     }
 
     fun setClickInterval(interval: Long, groupId: Int) {
-        for (clickableViewGroup in mClickables)
+        for (clickableViewGroup in this.mClickables)
             if (clickableViewGroup.groupId == groupId)
                 clickableViewGroup.minClickInterval = interval
     }
 
     fun getUnblocker(view: View): Runnable {
         return Runnable {
-            for (clickableViewGroup in mClickables)
+            for (clickableViewGroup in this.mClickables)
                 for (clickableView in clickableViewGroup.mutableListClickableView)
                     if (clickableView.view == view)
                         clickableViewGroup.isClickable.set(true)
@@ -67,7 +67,7 @@ class NoJitterOnClickListener : OnClickListener {
     }
 
     override fun onClick(view: View) {
-        for (clickableViewGroup in mClickables)
+        for (clickableViewGroup in this.mClickables)
             for (clickableView in clickableViewGroup.mutableListClickableView)
                 if (clickableView.view == view) {
                     if (clickableViewGroup.isAsync) {
