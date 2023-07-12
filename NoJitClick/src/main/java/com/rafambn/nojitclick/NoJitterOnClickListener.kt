@@ -5,13 +5,14 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.View.OnClickListener
+import java.util.concurrent.atomic.AtomicBoolean
 
 class NoJitterOnClickListener : OnClickListener {
     private val mClickables: MutableList<ClickableViewGroup>
     private val handler = Handler(Looper.getMainLooper())
 
     constructor() {
-        this.mClickables = arrayListOf(ClickableViewGroup(0, false, true, 1000, ArrayList()))
+        this.mClickables = arrayListOf(ClickableViewGroup(0, false, AtomicBoolean(true), 1000, ArrayList()))
     }
 
     fun setListener(view: View, listener: OnSingleClickListener): NoJitterOnClickListener {
@@ -32,7 +33,7 @@ class NoJitterOnClickListener : OnClickListener {
                 hasGroupId = true
             }
         if (!hasGroupId)
-            this.mClickables.add(ClickableViewGroup(groupId, false, true, clickInterval, arrayListOf(ClickableView(view, listener))))
+            this.mClickables.add(ClickableViewGroup(groupId, false, AtomicBoolean(true), clickInterval, arrayListOf(ClickableView(view, listener))))
         return this
     }
 
@@ -46,7 +47,7 @@ class NoJitterOnClickListener : OnClickListener {
                 hasGroupId = true
             }
         if (!hasGroupId)
-            this.mClickables.add(ClickableViewGroup(groupId, true, true, 1, arrayListOf(ClickableView(view, listener))))
+            this.mClickables.add(ClickableViewGroup(groupId, true, AtomicBoolean(true), 1, arrayListOf(ClickableView(view, listener))))
         return this
     }
 
@@ -56,11 +57,13 @@ class NoJitterOnClickListener : OnClickListener {
                 clickableViewGroup.minClickInterval = interval
     }
 
-    fun finishClick(view: View) {
-        for (clickableViewGroup in mClickables)
-            for (clickableView in clickableViewGroup.mutableListClickableView)
-                if (clickableView.view == view)
-                    clickableViewGroup.isClickable = true
+    fun getUnblocker(view: View): Runnable {
+        return Runnable {
+            for (clickableViewGroup in mClickables)
+                for (clickableView in clickableViewGroup.mutableListClickableView)
+                    if (clickableView.view == view)
+                        clickableViewGroup.isClickable.set(true)
+        }
     }
 
     override fun onClick(view: View) {
@@ -68,15 +71,15 @@ class NoJitterOnClickListener : OnClickListener {
             for (clickableView in clickableViewGroup.mutableListClickableView)
                 if (clickableView.view == view) {
                     if (clickableViewGroup.isAsync) {
-                        if (clickableViewGroup.isClickable) {
+                        if (clickableViewGroup.isClickable.get()) {
                             clickableView.listener.onSingleClick(view)
-                            clickableViewGroup.isClickable = false
+                            clickableViewGroup.isClickable.set(false)
                         }
                     } else {
-                        if (clickableViewGroup.isClickable) {
+                        if (clickableViewGroup.isClickable.get()) {
                             clickableView.listener.onSingleClick(view)
-                            clickableViewGroup.isClickable = false
-                            handler.postDelayed({ clickableViewGroup.isClickable = true }, clickableViewGroup.minClickInterval)
+                            clickableViewGroup.isClickable.set(false)
+                            handler.postDelayed({ clickableViewGroup.isClickable.set(true) }, clickableViewGroup.minClickInterval)
                         }
                     }
                 }
