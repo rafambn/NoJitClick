@@ -33,7 +33,15 @@ class NoJitterOnClickListener : OnClickListener {
                 hasGroupId = true
             }
         if (!hasGroupId)
-            this.mClickables.add(ClickableViewGroup(groupId, false, AtomicBoolean(true), clickInterval, arrayListOf(ClickableView(view, listener))))
+            this.mClickables.add(
+                ClickableViewGroup(
+                    groupId,
+                    false,
+                    AtomicBoolean(true),
+                    clickInterval,
+                    arrayListOf(ClickableView(view, listener))
+                )
+            )
         return this
     }
 
@@ -58,12 +66,11 @@ class NoJitterOnClickListener : OnClickListener {
     }
 
     fun getUnblocker(view: View): Runnable {
-        return Runnable {
-            for (clickableViewGroup in this.mClickables)
-                for (clickableView in clickableViewGroup.mutableListClickableView)
-                    if (clickableView.view == view)
-                        clickableViewGroup.isClickable.set(true)
-        }
+        for (clickableViewGroup in this.mClickables)
+            for (clickableView in clickableViewGroup.mutableListClickableView)
+                if (clickableView.view == view)
+                    return Runnable { clickableViewGroup.isClickable.set(true) }
+        return Runnable {  }
     }
 
     override fun onClick(view: View) {
