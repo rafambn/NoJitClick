@@ -1,6 +1,5 @@
 package com.rafambn.nojitclick
 
-
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -26,28 +25,32 @@ class NoJitterOnClickListener : OnClickListener {
     }
 
     fun setListener(view: View, listener: OnSingleClickListener, groupId: Int, clickInterval: Long): NoJitterOnClickListener {
-        var hasGroupId = false
         for (clickableViewGroup in this.mClickables)
             if (clickableViewGroup.groupId == groupId) {
                 clickableViewGroup.mutableListClickableView.add(ClickableView(view, listener))
-                hasGroupId = true
+                return this
             }
-        if (!hasGroupId)
-            this.mClickables.add(ClickableViewGroup(groupId, false, AtomicBoolean(true), clickInterval, arrayListOf(ClickableView(view, listener))))
+        this.mClickables.add(
+            ClickableViewGroup(
+                groupId,
+                false,
+                AtomicBoolean(true),
+                clickInterval,
+                arrayListOf(ClickableView(view, listener))
+            )
+        )
         return this
     }
 
     fun setAsyncListener(view: View, listener: OnSingleClickListener, groupId: Int): NoJitterOnClickListener? {
-        var hasGroupId = false
         for (clickableViewGroup in this.mClickables)
             if (clickableViewGroup.groupId == groupId) {
                 if (!clickableViewGroup.isAsync)
                     return null
                 clickableViewGroup.mutableListClickableView.add(ClickableView(view, listener))
-                hasGroupId = true
+                return this
             }
-        if (!hasGroupId)
-            this.mClickables.add(ClickableViewGroup(groupId, true, AtomicBoolean(true), 1, arrayListOf(ClickableView(view, listener))))
+        this.mClickables.add(ClickableViewGroup(groupId, true, AtomicBoolean(true), 1, arrayListOf(ClickableView(view, listener))))
         return this
     }
 
@@ -77,8 +80,8 @@ class NoJitterOnClickListener : OnClickListener {
                         }
                     } else {
                         if (clickableViewGroup.isClickable.get()) {
-                            clickableView.listener.onSingleClick(view)
                             clickableViewGroup.isClickable.set(false)
+                            clickableView.listener.onSingleClick(view)
                             handler.postDelayed({ clickableViewGroup.isClickable.set(true) }, clickableViewGroup.minClickInterval)
                         }
                     }
