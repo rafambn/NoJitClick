@@ -68,12 +68,16 @@ class NoJitterOnClickListener : OnClickListener {
             for (clickableView in clickableViewGroup.mutableListClickableView)
                 if (clickableView.view == view) {
                     if (clickableViewGroup.isAsync) {
-                        clickableView.listener.onSingleClick(view)
-                        clickableViewGroup.isClickable = false
+                        if (clickableViewGroup.isClickable) {
+                            clickableView.listener.onSingleClick(view)
+                            clickableViewGroup.isClickable = false
+                        }
                     } else {
-                        clickableView.listener.onSingleClick(view)
-                        clickableViewGroup.isClickable = false
-                        handler.postDelayed({ clickableViewGroup.isClickable = true }, clickableViewGroup.minClickInterval)
+                        if (clickableViewGroup.isClickable) {
+                            clickableView.listener.onSingleClick(view)
+                            clickableViewGroup.isClickable = false
+                            handler.postDelayed({ clickableViewGroup.isClickable = true }, clickableViewGroup.minClickInterval)
+                        }
                     }
                 }
     }
