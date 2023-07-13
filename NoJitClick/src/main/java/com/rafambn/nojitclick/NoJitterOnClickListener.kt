@@ -14,7 +14,13 @@ class NoJitterOnClickListener : OnClickListener {
         this.mClickables = ArrayList()
     }
 
-    fun setListener(view: View, groupId: Int = 0, clickInterval: Long = 1000, isAsync: Boolean = false, listener: OnSingleClickListener): NoJitterOnClickListener {
+    fun setListener(
+        view: View,
+        groupId: Int = 0,
+        clickInterval: Long = 1000,
+        isAsync: Boolean = false,
+        listener: OnClickListener
+    ): NoJitterOnClickListener {
         for (clickableViewGroup in this.mClickables)
             if (clickableViewGroup.groupId == groupId) {
                 clickableViewGroup.mutableListClickableView.add(ClickableView(view, listener, isAsync))
@@ -51,14 +57,10 @@ class NoJitterOnClickListener : OnClickListener {
             for (clickableView in clickableViewGroup.mutableListClickableView)
                 if (clickableView.view == view) {
                     if (clickableViewGroup.isClickable.get()) {
-                        if (clickableView.isAsync) {
-                            clickableViewGroup.isClickable.set(false)
-                            clickableView.listener.onSingleClick(view)
-                        } else {
-                            clickableViewGroup.isClickable.set(false)
-                            clickableView.listener.onSingleClick(view)
+                        clickableViewGroup.isClickable.set(false)
+                        clickableView.listener.onClick(view)
+                        if (!clickableView.isAsync)
                             handler.postDelayed({ clickableViewGroup.isClickable.set(true) }, clickableViewGroup.minClickInterval)
-                        }
                     }
                 }
     }
