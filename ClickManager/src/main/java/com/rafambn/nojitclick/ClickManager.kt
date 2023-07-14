@@ -7,7 +7,7 @@ import java.lang.reflect.Field
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ClickManager {
-    private val mClickables: MutableList<ClickableViewGroup>
+    val mClickables: MutableList<ClickableViewGroup>
 
     init {
         this.mClickables = ArrayList()
