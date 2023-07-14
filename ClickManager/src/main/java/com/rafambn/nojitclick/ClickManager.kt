@@ -6,11 +6,11 @@ import android.view.View
 import android.view.View.OnClickListener
 import java.util.concurrent.atomic.AtomicBoolean
 
-class NoJitterOnClickListener : OnClickListener { //TODO change name to ClickManager and optimize methods
+class ClickManager() : OnClickListener { //TODO optimize methods
     private val mClickables: MutableList<ClickableViewGroup>
     private val handler = Handler(Looper.getMainLooper())
 
-    constructor() {
+    init {
         this.mClickables = ArrayList()
     }
 
@@ -20,7 +20,7 @@ class NoJitterOnClickListener : OnClickListener { //TODO change name to ClickMan
         clickInterval: Long = 1000,
         isAsync: Boolean = false,
         listener: OnClickListener //TODO adapt to be used in recyclerView
-    ): NoJitterOnClickListener {
+    ): ClickManager {
         for (clickableViewGroup in this.mClickables)
             if (clickableViewGroup.groupId == groupId) {
                 clickableViewGroup.mutableListClickableView.add(ClickableView(view, listener, isAsync))

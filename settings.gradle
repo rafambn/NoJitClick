@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Clicks"
-include ':NoJitClick'
+include ':ClickManager'
