@@ -1,4 +1,4 @@
-package com.rafambn.nojitclick
+package com.rafambn.clickManager
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)

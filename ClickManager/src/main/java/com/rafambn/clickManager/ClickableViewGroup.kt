@@ -1,4 +1,4 @@
-package com.rafambn.nojitclick
+package com.rafambn.clickManager
 
 import java.util.concurrent.atomic.AtomicBoolean
 
