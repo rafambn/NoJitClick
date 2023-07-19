@@ -5,18 +5,17 @@ plugins {
 }
 
 android {
-    namespace 'com.rafambn.nojitclick'
-    compileSdk 33
+    namespace 'com.rafambn.clickmanager'
+    compileSdk 34
     def versionMajor = 1 /*Big changes*/
     def versionMinor = 0 /*New Functionalities*/
-    def versionPatch = 0 /*Corrections*/
     def versionFix = 0  /*Bug Fix */
 
     defaultConfig {
         minSdk 21
-        targetSdk 33
+        targetSdk 34
 
-        versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch * 10 + versionFix
+        versionCode versionMajor * 100 + versionMinor * 10 + versionFix
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
