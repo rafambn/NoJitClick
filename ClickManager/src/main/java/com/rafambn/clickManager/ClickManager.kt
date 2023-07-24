@@ -24,22 +24,23 @@ class ClickManager(activity: Activity) {
                     val groupId = markView.gruopId
                     val isAsync = markView.isAsync
                     val minClickInterval = markView.minClickInterval
-                    val listener = getListener(view)
-                    mClickables.find { it.groupId == groupId }?.let { } ?: run {
-                        mClickables.add(
-                            ClickableViewGroup(
-                                groupId,
-                                AtomicBoolean(true)
+                    getListener(view)?.let {
+                        mClickables.find { it.groupId == groupId }?.let { } ?: run {
+                            mClickables.add(
+                                ClickableViewGroup(
+                                    groupId,
+                                    AtomicBoolean(true)
+                                )
                             )
-                        )
-                    }
-                    view.setOnClickListener { view2 ->
-                        val clickableViewGroup = mClickables.find { it.groupId == groupId }!!
-                        if (clickableViewGroup.isClickable.get()) {
-                            clickableViewGroup.isClickable.set(false)
-                            listener.onClick(view2)
-                            if (!isAsync)
-                                mHandler.postDelayed({ clickableViewGroup.isClickable.set(true) }, minClickInterval)
+                        }
+                        view.setOnClickListener { view2 ->
+                            val clickableViewGroup = mClickables.find { it.groupId == groupId }!!
+                            if (clickableViewGroup.isClickable.get()) {
+                                clickableViewGroup.isClickable.set(false)
+                                it.onClick(view2)
+                                if (!isAsync)
+                                    mHandler.postDelayed({ clickableViewGroup.isClickable.set(true) }, minClickInterval)
+                            }
                         }
                     }
                 }
@@ -51,19 +52,17 @@ class ClickManager(activity: Activity) {
                         val isAsync = markView.isAsync
                         val minClickInterval = markView.minClickInterval
                         val proxyInstance = Proxy.newProxyInstance(fieldType.classLoader, arrayOf(fieldType)) { proxy, method, args ->
-                            {
-                                if (method.name == "onClick") {
-                                    val clickableViewGroup = mClickables.find { it.groupId == groupId }!!
-                                    if (clickableViewGroup.isClickable.get()) {
-                                        clickableViewGroup.isClickable.set(false)
-                                        if (!isAsync)
-                                            mHandler.postDelayed({ clickableViewGroup.isClickable.set(true) }, minClickInterval)
-                                        method.invoke(proxy, *args.orEmpty())
-                                    } else
-                                        null
-                                } else
+                            if (method.name == "onClick") {
+                                val clickableViewGroup = mClickables.find { it.groupId == groupId }!!
+                                if (clickableViewGroup.isClickable.get()) {
+                                    clickableViewGroup.isClickable.set(false)
+                                    if (!isAsync)
+                                        mHandler.postDelayed({ clickableViewGroup.isClickable.set(true) }, minClickInterval)
                                     method.invoke(proxy, *args.orEmpty())
-                            }
+                                } else
+                                    null
+                            } else
+                                method.invoke(proxy, *args.orEmpty())
                         }
                         field.set(activity, proxyInstance)
                     }
@@ -72,14 +71,14 @@ class ClickManager(activity: Activity) {
         }
     }
 
-    private fun getListener(view: View): OnClickListener {
+    private fun getListener(view: View): OnClickListener? {
         val listenerInfoFieldName = "mListenerInfo"
         val onCLickListenerFieldName = "mOnClickListener"
 
         val listenerInfo = getValueFromObject(view, listenerInfoFieldName)
         return listenerInfo?.let {
             getValueFromObject(it, onCLickListenerFieldName) as OnClickListener
-        }!!
+        }
     }
 
     private fun getValueFromObject(`object`: Any, fieldName: String): Any? {
