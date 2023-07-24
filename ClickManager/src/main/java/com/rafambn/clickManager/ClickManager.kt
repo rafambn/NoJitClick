@@ -58,11 +58,11 @@ class ClickManager(activity: Activity) {
                                     clickableViewGroup.isClickable.set(false)
                                     if (!isAsync)
                                         mHandler.postDelayed({ clickableViewGroup.isClickable.set(true) }, minClickInterval)
-                                    method.invoke(proxy, *args.orEmpty())
+                                    method.invoke(field.get(activity), *args.orEmpty())
                                 } else
                                     null
                             } else
-                                method.invoke(proxy, *args.orEmpty())
+                                method.invoke(field.get(activity), *args.orEmpty())
                         }
                         field.set(activity, proxyInstance)
                     }
