@@ -18,53 +18,45 @@ class ClickManager(activity: Activity) {
         val fieldList = activity.javaClass.declaredFields
         for (field in fieldList) {
             field.isAccessible = true
-            if (field.isAnnotationPresent(ManageView::class.java)) {
-                field.getAnnotation(ManageView::class.java)?.let { markView ->
-                    val view = field.get(activity) as View
-                    val groupId = markView.gruopId
-                    val isAsync = markView.isAsync
-                    val minClickInterval = markView.minClickInterval
-                    getListener(view)?.let {
-                        mClickables.find { it.groupId == groupId }?.let { } ?: run {
-                            mClickables.add(
-                                ClickableViewGroup(
-                                    groupId,
-                                    AtomicBoolean(true)
-                                )
-                            )
-                        }
-                        view.setOnClickListener { view2 ->
-                            val clickableViewGroup = mClickables.find { it.groupId == groupId }!!
-                            if (clickableViewGroup.isClickable.get()) {
-                                clickableViewGroup.isClickable.set(false)
-                                it.onClick(view2)
-                                if (!isAsync)
-                                    mHandler.postDelayed({ clickableViewGroup.isClickable.set(true) }, minClickInterval)
+            field.getAnnotation(ManageClick::class.java)?.let { markView ->
+                val groupId = markView.gruopId
+                val isAsync = markView.isAsync
+                val minClickInterval = markView.minClickInterval
+                val fieldType = field.type
+                mClickables.find { it.groupId == groupId } ?: run {
+                    mClickables.add(ClickableViewGroup(groupId, AtomicBoolean(true)))
+                }
+                if (fieldType.isInterface) {
+                    val originalObject = field.get(activity)
+                    val proxyInstance = Proxy.newProxyInstance(fieldType.classLoader, arrayOf(fieldType)) { proxy, method, args ->
+                        if (method.name == "onClick") {
+                            mClickables.find { it.groupId == groupId }?.let { viewGroup ->
+                                if (viewGroup.isClickable.get()) {
+                                    viewGroup.isClickable.set(false)
+                                    method.invoke(originalObject, *args.orEmpty())
+                                    if (!isAsync)
+                                        mHandler.postDelayed({ viewGroup.isClickable.set(true) }, minClickInterval)
+                                }
                             }
+                            null
+                        } else {
+                            method.invoke(originalObject, *args.orEmpty())
                         }
                     }
-                }
-            } else if (field.isAnnotationPresent(ManageListener::class.java)) {
-                val fieldType = field.type
-                if (fieldType.isInterface) {
-                    field.getAnnotation(ManageListener::class.java)?.let { markView ->
-                        val groupId = markView.gruopId
-                        val isAsync = markView.isAsync
-                        val minClickInterval = markView.minClickInterval
-                        val proxyInstance = Proxy.newProxyInstance(fieldType.classLoader, arrayOf(fieldType)) { proxy, method, args ->
-                            if (method.name == "onClick") {
-                                val clickableViewGroup = mClickables.find { it.groupId == groupId }!!
-                                if (clickableViewGroup.isClickable.get()) {
-                                    clickableViewGroup.isClickable.set(false)
+                    field.set(activity, proxyInstance)
+                } else {
+                    val fieldView = field.get(activity) as View
+                    getListener(fieldView)?.let { onClickListener ->
+                        fieldView.setOnClickListener { view ->
+                            mClickables.find { it.groupId == groupId }?.let { viewGroup ->
+                                if (viewGroup.isClickable.get()) {
+                                    viewGroup.isClickable.set(false)
+                                    onClickListener.onClick(view)
                                     if (!isAsync)
-                                        mHandler.postDelayed({ clickableViewGroup.isClickable.set(true) }, minClickInterval)
-                                    method.invoke(field.get(activity), *args.orEmpty())
-                                } else
-                                    null
-                            } else
-                                method.invoke(field.get(activity), *args.orEmpty())
+                                        mHandler.postDelayed({ viewGroup.isClickable.set(true) }, minClickInterval)
+                                }
+                            }
                         }
-                        field.set(activity, proxyInstance)
                     }
                 }
             }
