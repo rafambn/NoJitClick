@@ -11,7 +11,6 @@ This happens because the clicks are queued to be executed, but if this causes lo
 ```groovy
 allprojects {
 	repositories {
-		...
 		maven { url 'https://jitpack.io' }
 	}
 }
@@ -25,6 +24,7 @@ dependencies {
 # How it works
 <p align="center"><img src="https://github.com/rafambn/ClickManager/blob/master/arts/viewGroups.png" /></p>
 In the image above, the blue spots are from a different viewGroup than the red ones, which means that if both blue or red buttons are pressed, only one will be executed, while if a blue and a red button are clicked, both will be executed.
+
 # How to use
 1. Declare the ClickManager variable:
 ```kotlin
