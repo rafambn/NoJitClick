@@ -26,7 +26,6 @@ dependencies {
 In the image above, the blue spots are from a different viewGroup than the red ones, which means that if both blue or red buttons are pressed, only one will be executed, while if a blue and a red button are clicked, both will be executed.
 
 After some time of being clicked, the view group will be unblocked for clicking again. The time is determined by the minClickInterval on the annotation and it is different for each view.
-
 If the view is async, the view group will only be unblocked if the Runnable is executed.
 
 # How to use
