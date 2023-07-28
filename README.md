@@ -18,7 +18,7 @@ allprojects {
 2. Add the dependency:
 ```groovy
 dependencies {
-	implementation 'com.github.rafambn:ClickManager:Tag'
+	implementation 'com.github.rafambn:ClickManager:3.1'
 }
 ```
 # How it works
