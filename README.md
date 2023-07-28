@@ -24,7 +24,9 @@ dependencies {
 # How it works
 <p align="center"><img src="https://github.com/rafambn/ClickManager/blob/master/arts/viewGroups.png" /></p>
 In the image above, the blue spots are from a different viewGroup than the red ones, which means that if both blue or red buttons are pressed, only one will be executed, while if a blue and a red button are clicked, both will be executed.
+
 After some time of being clicked, the view group will be unblocked for clicking again. The time is determined by the minClickInterval on the annotation and it is different for each view.
+
 If the view is async, the view group will only be unblocked if the Runnable is executed.
 
 # How to use
@@ -75,6 +77,7 @@ suspend fun(unBlocker: Runnable) {
 - It will only manage clicks of the “onClick” methods of the interfaces. Further improvements will allow it to manage other methods of interfaces.
 - If the listeners of the view change it will not work
 - It is designed to only work in views activities, it wasn’t tested or designed to work with Compose.
+
 Feel free to improve upon these limitations or report issues
 
 # License
