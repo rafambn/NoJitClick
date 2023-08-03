@@ -7,8 +7,8 @@ plugins {
 android {
     namespace 'com.rafambn.clickmanager'
     compileSdk 34
-    def versionMajor = 1 /*Big changes*/
-    def versionMinor = 0 /*New Functionalities*/
+    def versionMajor = 3 /*Big changes*/
+    def versionMinor = 1 /*New Functionalities*/
     def versionFix = 0  /*Bug Fix */
 
     defaultConfig {
